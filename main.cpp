@@ -62,13 +62,32 @@ public:
     void display()
     {
         Library *temp = libraryHead;
+
+        int xPosition = 20;
+        int yPosition = 100;
+
+        int xOffSet = 600;
+        int yOffSet = 30;
+
         while (temp != NULL)
         {
-            cout << temp->data.title << " ";
-            cout << temp->data.duration << " ";
-            cout << temp->data.genre << " ";
-            cout << temp->data.artist << " ";
-            cout << endl;
+
+            string songInfo = temp->data.title + " | " + to_string(temp->data.duration) + " | " + temp->data.genre + " | " + temp->data.artist;
+
+            DrawText(songInfo.c_str(), xPosition, yPosition, 20, WHITE);
+
+            yPosition += yOffSet;
+
+            if (yPosition > GetScreenHeight() - 40)
+            {
+                yPosition = 100;
+                xPosition += xOffSet;
+            }
+
+            if (xPosition > GetScreenWidth() - 100)
+            {
+                break;
+            }
             temp = temp->next;
         }
     }
@@ -214,7 +233,7 @@ int main()
         {
         case 1:
             libraryManager.display();
-            DrawText("Displaying Music Library", 20, 260, fontSize, textColor);
+
             break;
         case 2:
             DrawText("Enter the title of the song you want to search: ", 20, 260, fontSize, textColor);
