@@ -1,5 +1,6 @@
 #include <iostream>
 #include <raylib.h>
+// #include <raygui.h>
 #include <fstream>
 #include <sstream>
 using namespace std;
@@ -18,6 +19,7 @@ struct Library
     Library *next;
     Library *prev;
 };
+
 class LibraryManager
 {
 private:
@@ -147,43 +149,102 @@ public:
 };
 int main()
 {
+
     const int screenWidth = 800;
     const int screenHeight = 600;
     InitWindow(screenWidth, screenHeight, "Music Library");
+
+    const int fontSize = 20;
+    Color textColor = WHITE;
+
+    char titleInput[100] = {0};  // Buffer for song title input
+    char artistInput[100] = {0}; // Buffer for artist input
+
+    // initialize stuff for raylib
+
     int choice = 0;
     string title;
     string artist;
     LibraryManager libraryManager;
     libraryManager.loadLibraryFromCSV("Database/library.csv");
-    while (true)
+
+    while (!WindowShouldClose())
     {
-        cout << "Menu:" << endl;
-        cout << "1. Display Music Library." << endl;
-        cout << "2. Search By Title." << endl;
-        cout << "3. Search By Artist." << endl;
-        cout << "4. Exit" << endl;
-        cout << "Enter your choice (1-4): ";
-        cin >> choice;
+
+        // start drwaing and clear screen
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        // display text
+
+        DrawText("Menu:", 20, 20, fontSize, textColor);
+        DrawText("1. Display Music Library.", 20, 60, fontSize, textColor);
+        DrawText("2. Search By Title.", 20, 100, fontSize, textColor);
+        DrawText("3. Search By Artist.", 20, 140, fontSize, textColor);
+        DrawText("4. Exit", 20, 180, fontSize, textColor);
+
+        // prompt
+
+        DrawText("Enter your choice (1-4): ", 20, 220, fontSize, textColor);
+
+        if (IsKeyPressed(KEY_ONE))
+        {
+            choice = 1;
+        }
+        if (IsKeyPressed(KEY_TWO))
+        {
+            choice = 2;
+        }
+        if (IsKeyPressed(KEY_THREE))
+        {
+            choice = 3;
+        }
+        if (IsKeyPressed(KEY_FOUR))
+        {
+            choice = 4;
+        }
+
+        // cout << "Menu:" << endl;
+        // cout << "1. Display Music Library." << endl;
+        // cout << "2. Search By Title." << endl;
+        // cout << "3. Search By Artist." << endl;
+        // cout << "4. Exit" << endl;
+        // cout << "Enter your choice (1-4): ";
+
+        // cin >> choice;
         switch (choice)
         {
         case 1:
             libraryManager.display();
+            DrawText("Displaying Music Library", 20, 260, fontSize, textColor);
             break;
         case 2:
-            cout << "Enter the title of the song you want to search: ";
-            cin >> title;
-            libraryManager.searchByTitle(title);
+            DrawText("Enter the title of the song you want to search: ", 20, 260, fontSize, textColor);
+
+            // cin >> title;
+            libraryManager.searchByTitle(titleInput);
+            DrawText("Searching By Title", 20, 300, fontSize, textColor);
             break;
         case 3:
-            cout << "Enter the artist of the song you want to search: ";
-            cin >> artist;
-            libraryManager.searchByArtist(artist);
+            // cout << "Enter the artist of the song you want to search: ";
+            DrawText("Enter the artist of the song you want to search: ", 20, 260, fontSize, textColor);
+            // cin >> artist;
+            // GuiTextBox(Rectangle{20, 300, 200, 40}, artistInput, 100, true);
+
+            libraryManager.searchByArtist(artistInput);
+            DrawText("Searching By Artist", 20, 300, fontSize, textColor);
             break;
         case 4:
-            cout << "Exiting the program..." << endl;
+            // cout << "Exiting the program..." << endl;
+            DrawText("Exiting the program...", 20, 260, fontSize, textColor);
+            EndDrawing();
             return 0;
         default:
-            cout << "Invalid choice. Please enter a number between 1 and 4." << endl;
+            // cout << "Invalid choice. Please enter a number between 1 and 4." << endl;
+            DrawText("Invalid choice. Please enter a number between 1 and 4.", 20, 260, fontSize, textColor);
         }
+
+        EndDrawing();
     }
+    CloseWindow();
 }
