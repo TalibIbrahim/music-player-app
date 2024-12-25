@@ -1,6 +1,5 @@
 #include <iostream>
 #include <raylib.h>
-// #include <raygui.h>
 #include <fstream>
 #include <sstream>
 using namespace std;
@@ -19,7 +18,6 @@ struct Library
     Library *next;
     Library *prev;
 };
-
 class LibraryManager
 {
 private:
@@ -150,8 +148,8 @@ public:
 int main()
 {
 
-    const int screenWidth = 800;
-    const int screenHeight = 600;
+    const int screenWidth = 1600;
+    const int screenHeight = 900;
     InitWindow(screenWidth, screenHeight, "Music Library");
 
     const int fontSize = 20;
@@ -178,14 +176,14 @@ int main()
         // display text
 
         DrawText("Menu:", 20, 20, fontSize, textColor);
-        DrawText("1. Display Music Library.", 20, 60, fontSize, textColor);
-        DrawText("2. Search By Title.", 20, 100, fontSize, textColor);
-        DrawText("3. Search By Artist.", 20, 140, fontSize, textColor);
-        DrawText("4. Exit", 20, 180, fontSize, textColor);
+        DrawText("| 1. Display Music Library. |", 120, 20, fontSize, textColor);
+        DrawText("2. Search By Title. |", 400, 20, fontSize, textColor);
+        DrawText("3. Search By Artist. |", 620, 20, fontSize, textColor);
+        DrawText("4. Exit |", 850, 20, fontSize, textColor);
 
         // prompt
 
-        DrawText("Enter your choice (1-4): ", 20, 220, fontSize, textColor);
+        DrawText("Enter your choice (1-4): ", 20, 60, fontSize, textColor);
 
         if (IsKeyPressed(KEY_ONE))
         {
@@ -220,7 +218,6 @@ int main()
             break;
         case 2:
             DrawText("Enter the title of the song you want to search: ", 20, 260, fontSize, textColor);
-
             // cin >> title;
             libraryManager.searchByTitle(titleInput);
             DrawText("Searching By Title", 20, 300, fontSize, textColor);
@@ -229,7 +226,6 @@ int main()
             // cout << "Enter the artist of the song you want to search: ";
             DrawText("Enter the artist of the song you want to search: ", 20, 260, fontSize, textColor);
             // cin >> artist;
-            // GuiTextBox(Rectangle{20, 300, 200, 40}, artistInput, 100, true);
 
             libraryManager.searchByArtist(artistInput);
             DrawText("Searching By Artist", 20, 300, fontSize, textColor);
