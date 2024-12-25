@@ -9,6 +9,8 @@
     "**/*.exe": true
   },
   "files.associations": {
-    "iostream": "cpp"
+    "*.ejs": "html",
+    "iostream": "cpp",
+    "fstream": "cpp"
   }
 }
