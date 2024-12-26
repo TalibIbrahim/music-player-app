@@ -1,8 +1,9 @@
 #include <iostream>
-#include <raylib.h>
+// #include <raylib.h>
 #include <fstream>
 #include <sstream>
 using namespace std;
+
 struct Song
 {
     string title;
@@ -63,31 +64,13 @@ public:
     {
         Library *temp = libraryHead;
 
-        int xPosition = 20;
-        int yPosition = 100;
-
-        int xOffSet = 600;
-        int yOffSet = 30;
-
         while (temp != NULL)
         {
-
-            string songInfo = temp->data.title + " | " + to_string(temp->data.duration) + " | " + temp->data.genre + " | " + temp->data.artist;
-
-            DrawText(songInfo.c_str(), xPosition, yPosition, 20, WHITE);
-
-            yPosition += yOffSet;
-
-            if (yPosition > GetScreenHeight() - 40)
-            {
-                yPosition = 100;
-                xPosition += xOffSet;
-            }
-
-            if (xPosition > GetScreenWidth() - 100)
-            {
-                break;
-            }
+            cout << temp->data.title << " ";
+            cout << temp->data.duration << " ";
+            cout << temp->data.genre << " ";
+            cout << temp->data.artist << " ";
+            cout << endl;
             temp = temp->next;
         }
     }
@@ -112,10 +95,13 @@ public:
     void searchByArtist(string artist)
     {
         Library *temp = libraryHead;
+
         while (temp != NULL)
         {
+
             if (temp->data.artist == artist)
             {
+
                 cout << temp->data.title << " ";
                 cout << temp->data.duration << " ";
                 cout << temp->data.genre << " ";
@@ -167,99 +153,49 @@ public:
 int main()
 {
 
-    const int screenWidth = 1600;
-    const int screenHeight = 900;
-    InitWindow(screenWidth, screenHeight, "Music Library");
-
-    const int fontSize = 20;
-    Color textColor = WHITE;
-
-    char titleInput[100] = {0};  // Buffer for song title input
-    char artistInput[100] = {0}; // Buffer for artist input
-
-    // initialize stuff for raylib
-
     int choice = 0;
     string title;
     string artist;
     LibraryManager libraryManager;
     libraryManager.loadLibraryFromCSV("Database/library.csv");
 
-    while (!WindowShouldClose())
+    while (true)
     {
+        // Display menu options
+        cout << "Menu:" << endl;
+        cout << "1. Display Music Library." << endl;
+        cout << "2. Search By Title." << endl;
+        cout << "3. Search By Artist." << endl;
+        cout << "4. Exit" << endl;
 
-        // start drwaing and clear screen
-        BeginDrawing();
-        ClearBackground(BLACK);
+        // Get user's choice
+        cout << "Enter your choice (1-4): ";
+        cin >> choice;
+        cin.ignore(); // Ignore the newline character left by cin
 
-        // display text
-
-        DrawText("Menu:", 20, 20, fontSize, textColor);
-        DrawText("| 1. Display Music Library. |", 120, 20, fontSize, textColor);
-        DrawText("2. Search By Title. |", 400, 20, fontSize, textColor);
-        DrawText("3. Search By Artist. |", 620, 20, fontSize, textColor);
-        DrawText("4. Exit |", 850, 20, fontSize, textColor);
-
-        // prompt
-
-        DrawText("Enter your choice (1-4): ", 20, 60, fontSize, textColor);
-
-        if (IsKeyPressed(KEY_ONE))
-        {
-            choice = 1;
-        }
-        if (IsKeyPressed(KEY_TWO))
-        {
-            choice = 2;
-        }
-        if (IsKeyPressed(KEY_THREE))
-        {
-            choice = 3;
-        }
-        if (IsKeyPressed(KEY_FOUR))
-        {
-            choice = 4;
-        }
-
-        // cout << "Menu:" << endl;
-        // cout << "1. Display Music Library." << endl;
-        // cout << "2. Search By Title." << endl;
-        // cout << "3. Search By Artist." << endl;
-        // cout << "4. Exit" << endl;
-        // cout << "Enter your choice (1-4): ";
-
-        // cin >> choice;
         switch (choice)
         {
         case 1:
             libraryManager.display();
-
             break;
         case 2:
-            DrawText("Enter the title of the song you want to search: ", 20, 260, fontSize, textColor);
-            // cin >> title;
-            libraryManager.searchByTitle(titleInput);
-            DrawText("Searching By Title", 20, 300, fontSize, textColor);
+            cout << "Enter Title: ";
+            cin >> title;
+            libraryManager.searchByTitle(title);
             break;
         case 3:
-            // cout << "Enter the artist of the song you want to search: ";
-            DrawText("Enter the artist of the song you want to search: ", 20, 260, fontSize, textColor);
-            // cin >> artist;
-
-            libraryManager.searchByArtist(artistInput);
-            DrawText("Searching By Artist", 20, 300, fontSize, textColor);
+            cout << "Enter Artist: ";
+            cin >> artist;
+            libraryManager.searchByArtist(artist);
             break;
         case 4:
-            // cout << "Exiting the program..." << endl;
-            DrawText("Exiting the program...", 20, 260, fontSize, textColor);
-            EndDrawing();
+            cout << "Exiting the program..." << endl;
             return 0;
         default:
-            // cout << "Invalid choice. Please enter a number between 1 and 4." << endl;
-            DrawText("Invalid choice. Please enter a number between 1 and 4.", 20, 260, fontSize, textColor);
+            cout << "Invalid choice. Please enter a number between 1 and 4." << endl;
+            break;
         }
-
-        EndDrawing();
     }
-    CloseWindow();
+
+    return 0;
 }

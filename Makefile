@@ -249,6 +249,8 @@ ifeq ($(PLATFORM),PLATFORM_WEB)
 endif
 
 # Define include paths for required headers
+
+SRC = $(call rwildcard, *.c, *.h) $(RAYLIB_PATH)/src/raygui.c
 # NOTE: Several external required libraries (stb and others)
 INCLUDE_PATHS = -I. -I$(RAYLIB_PATH)/src -I$(RAYLIB_PATH)/src/external
 ifneq ($(wildcard /opt/homebrew/include/.*),)
