@@ -95,10 +95,10 @@ public:
     void searchByArtist(string artist)
     {
         Library *temp = libraryHead;
+        int count = 0;
 
         while (temp != NULL)
         {
-
             if (temp->data.artist == artist)
             {
 
@@ -107,8 +107,13 @@ public:
                 cout << temp->data.genre << " ";
                 cout << temp->data.artist << " ";
                 cout << endl;
+                count++;
             }
             temp = temp->next;
+        }
+        if (count == 0)
+        {
+            cout << "Artist not found" << endl;
         }
     }
     void loadLibraryFromCSV(const string &fileName)
