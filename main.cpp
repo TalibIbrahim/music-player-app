@@ -2,8 +2,18 @@
 // #include <raylib.h>
 #include <fstream>
 #include <sstream>
+#include <cctype>
 using namespace std;
-
+string toLower(string &str)
+{
+    // convert to lowercase including spaces and return a copy of original string
+    string newStr = str;
+    for (int i = 0; i < newStr.length(); i++)
+    {
+        newStr[i] = tolower(newStr[i]);
+    }
+    return newStr;
+}
 struct Song
 {
     string title;
@@ -18,6 +28,139 @@ struct Library
     Song data;
     Library *next;
     Library *prev;
+};
+struct Playlist
+{
+    string name;
+    Library *songs;
+    Playlist *next;
+    Playlist *prev;
+};
+
+struct UserLibrary
+{
+    Playlist *playlistsHead;
+    UserLibrary *next;
+    UserLibrary *prev;
+};
+class UserLibraryManager
+{
+private:
+    UserLibrary *userLibraryHead;
+
+public:
+    UserLibraryManager()
+    {
+        userLibraryHead = NULL;
+    }
+    ~UserLibraryManager()
+    {
+        // UserLibrary *temp = userLibraryHead;
+        // while (temp != NULL)
+        // {
+        //     UserLibrary *next = temp->next;
+        //     delete temp;
+        //     temp = next;
+        // }
+    }
+    void createPlaylistInLibrary(string name)
+    {
+        Playlist *newPlaylist = new Playlist();
+        newPlaylist->name = name;
+        newPlaylist->songs = NULL;
+        newPlaylist->next = NULL;
+        newPlaylist->prev = NULL;
+        if (userLibraryHead == NULL)
+        {
+            userLibraryHead = new UserLibrary();
+            userLibraryHead->playlistsHead = newPlaylist;
+        }
+        else
+        {
+            UserLibrary *temp = userLibraryHead;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = new UserLibrary();
+            temp->next->prev = temp;
+            temp->next->playlistsHead = newPlaylist;
+        }
+    }
+    Playlist *getPlaylist(string name)
+    {
+        UserLibrary *temp = userLibraryHead;
+        while (temp != NULL)
+        {
+            Playlist *tempPlaylist = temp->playlistsHead;
+            while (tempPlaylist != NULL)
+            {
+                if (tempPlaylist->name == name)
+                {
+                    return tempPlaylist;
+                }
+                tempPlaylist = tempPlaylist->next;
+            }
+            temp = temp->next;
+        }
+        return NULL;
+    }
+    void addSongToPlaylist(string playlistName, Song song)
+    {
+        Playlist *playlist = getPlaylist(playlistName);
+        if (playlist == NULL)
+        {
+            cout << "Playlist not found" << endl;
+            return;
+        }
+        Library *newSong = new Library();
+        newSong->data = song;
+        newSong->next = NULL;
+        newSong->prev = NULL;
+        if (playlist->songs == NULL)
+        {
+            playlist->songs = newSong;
+        }
+        else
+        {
+            Library *temp = playlist->songs;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = newSong;
+            newSong->prev = temp;
+        }
+    }
+    void displayUserLibrary()
+    {
+        // displaying playlists in library without songs
+        UserLibrary *temp = userLibraryHead;
+        while (temp != NULL)
+        {
+            cout << "Playlist: " << temp->playlistsHead->name << endl;
+            temp = temp->next;
+        }
+    }
+    void displayPlaylist(string playlistName)
+    {
+        Playlist *playlist = getPlaylist(playlistName);
+        if (playlist == NULL)
+        {
+            cout << "Playlist not found" << endl;
+            return;
+        }
+        Library *temp = playlist->songs;
+        while (temp != NULL)
+        {
+            cout << temp->data.title << " ";
+            cout << temp->data.duration << " ";
+            cout << temp->data.genre << " ";
+            cout << temp->data.artist << " ";
+            cout << endl;
+            temp = temp->next;
+        }
+    }
 };
 class LibraryManager
 {
@@ -39,7 +182,7 @@ public:
         //     temp = next;
         // }
     }
-    void addToLibrary(Song song)
+    void addSongToLibrary(Song song)
     {
         Library *newSong = new Library();
         newSong->data = song;
@@ -74,32 +217,37 @@ public:
             temp = temp->next;
         }
     }
-    void searchByTitle(string title)
+    void displaySong(Song song)
+    {
+        cout << song.title << " ";
+        cout << song.duration << " ";
+        cout << song.genre << " ";
+        cout << song.artist << " ";
+        cout << endl;
+    }
+    Song *searchByTitle(string title)
     {
         Library *temp = libraryHead;
+        string ConvertedTitle = toLower(title);
         while (temp != NULL)
         {
-            if (temp->data.title == title)
+            if (toLower(temp->data.title) == ConvertedTitle)
             {
-                cout << temp->data.title << " ";
-                cout << temp->data.duration << " ";
-                cout << temp->data.genre << " ";
-                cout << temp->data.artist << " ";
-                cout << endl;
-                return;
+                return &temp->data;
             }
             temp = temp->next;
         }
-        cout << "Song not found" << endl;
+        return NULL;
     }
     void searchByArtist(string artist)
     {
+        string ConvertedArtist = toLower(artist);
         Library *temp = libraryHead;
         int count = 0;
 
         while (temp != NULL)
         {
-            if (temp->data.artist == artist)
+            if (toLower(temp->data.artist) == ConvertedArtist)
             {
 
                 cout << temp->data.title << " ";
@@ -149,7 +297,7 @@ public:
             Song song = {title, duration, genre, artist, fileName};
 
             // Add the song to the library linked list
-            addToLibrary(song);
+            addSongToLibrary(song);
         }
 
         file.close(); // Close the file after reading
@@ -157,7 +305,9 @@ public:
 };
 int main()
 {
-
+    string playlistName;
+    UserLibraryManager userLibraryManager;
+    Song *song;
     int choice = 0;
     string title;
     string artist;
@@ -171,7 +321,11 @@ int main()
         cout << "1. Display Music Library." << endl;
         cout << "2. Search By Title." << endl;
         cout << "3. Search By Artist." << endl;
-        cout << "4. Exit" << endl;
+        cout << "4. Create Playlist." << endl;
+        cout << "5. Display Playlist." << endl;
+        cout << "6. Add Song to Playlist." << endl;
+        cout << "7. Display User Library." << endl;
+        cout << "8. Exit" << endl;
 
         // Get user's choice
         cout << "Enter your choice (1-4): ";
@@ -185,17 +339,54 @@ int main()
             break;
         case 2:
             cout << "Enter Title: ";
-            cin >> title;
-            libraryManager.searchByTitle(title);
+            getline(cin, title);
+            song = libraryManager.searchByTitle(title);
+            if (song == NULL)
+            {
+                cout << "Song not found" << endl;
+            }
+            else
+            {
+                libraryManager.displaySong(*song);
+            }
             break;
         case 3:
             cout << "Enter Artist: ";
-            cin >> artist;
+            getline(cin, artist);
             libraryManager.searchByArtist(artist);
             break;
         case 4:
+            cout << "Enter Playlist Name: ";
+            getline(cin, playlistName);
+            userLibraryManager.createPlaylistInLibrary(playlistName);
+            break;
+        case 5:
+            cout << "Enter Playlist Name: ";
+            getline(cin, playlistName);
+            userLibraryManager.displayPlaylist(playlistName);
+            break;
+        case 6:
+            cout << "Enter Playlist Name: ";
+            getline(cin, playlistName);
+            cout << "Enter Song Title: ";
+            getline(cin, title);
+            song = libraryManager.searchByTitle(title);
+            if (song == NULL)
+            {
+                cout << "Song not found" << endl;
+            }
+            else
+            {
+                userLibraryManager.addSongToPlaylist(playlistName, *song);
+            }
+            break;
+        case 7:
+            userLibraryManager.displayUserLibrary();
+            break;
+        case 8:
             cout << "Exiting the program..." << endl;
             return 0;
+
         default:
             cout << "Invalid choice. Please enter a number between 1 and 4." << endl;
             break;
