@@ -328,7 +328,7 @@ int main()
         cout << "8. Exit" << endl;
 
         // Get user's choice
-        cout << "Enter your choice (1-4): ";
+        cout << "Enter your choice (1-8): ";
         cin >> choice;
         cin.ignore(); // Ignore the newline character left by cin
 
