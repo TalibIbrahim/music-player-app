@@ -194,7 +194,6 @@ public:
     void playSongFromPlaylist()
     {
         string playlistName;
-        string songTitle;
         cout << "Enter the playlist name: ";
         getline(cin, playlistName);
         Playlist *playlist = getPlaylist(playlistName);
@@ -216,35 +215,26 @@ public:
             temp = temp->next;
         }
         currentlyPlayingSong = currentlyPlayingHead;
-        int choice = 0;
+        cout << endl;
+        cout << "-----------------------------" << endl;
+        cout << "      " << currentlyPlayingSong->data.title << endl;
+        cout << "      " << currentlyPlayingSong->data.artist << endl;
+        cout << "           \u23EE \u23F8 \u23ED" << endl;
+        cout << "-----------------------------" << endl;
+        bool isPlaying = true;
         while (true)
         {
-            cout << endl;
-            cout << "-----------------------------" << endl;
-            cout << "      " << currentlyPlayingSong->data.title << endl;
-            cout << "      " << currentlyPlayingSong->data.artist << endl;
-            cout << "           \u23EE \u23F8 \u23ED" << endl;
-            cout << "-----------------------------" << endl;
-            cout << "1. Next \u23ED" << endl;
-            cout << "2. Previous \u23EE" << endl;
-            cout << "3. Add to Queue." << endl;
-            cout << "4. Exit" << endl;
+            int choice;
+            cout << "1. Previous \u23EE" << endl;
+            cout << "2. Play/Pause" << endl;
+            cout << "3. Next \u23ED" << endl;
+            cout << "4. Add to Queue." << endl;
+            cout << "5. Exit" << endl;
             cout << "Enter your choice: ";
             cin >> choice;
             switch (choice)
             {
             case 1:
-                if (currentlyPlayingSong->next != NULL)
-                {
-                    currentlyPlayingSong = currentlyPlayingSong->next;
-                }
-                else
-                {
-                    cout << endl;
-                    cout << "End of playlist" << endl;
-                }
-                break;
-            case 2:
                 if (currentlyPlayingSong->prev != NULL)
                 {
                     currentlyPlayingSong = currentlyPlayingSong->prev;
@@ -254,9 +244,53 @@ public:
                     cout << endl;
                     cout << "Start of playlist" << endl;
                 }
+                currentlyPlayingSong = currentlyPlayingHead;
+                cout << endl;
+                cout << "-----------------------------" << endl;
+                cout << "      " << currentlyPlayingSong->data.title << endl;
+                cout << "      " << currentlyPlayingSong->data.artist << endl;
+                cout << "           \u23EE \u23F8 \u23ED" << endl;
+                cout << "-----------------------------" << endl;
+                break;
+            case 2:
+
+                isPlaying = !isPlaying;
+                cout << endl;
+                cout << "-----------------------------" << endl;
+                cout << "      " << currentlyPlayingSong->data.title << endl;
+                cout << "      " << currentlyPlayingSong->data.artist << endl;
+                if (isPlaying)
+                {
+                    cout << "         \u23EE \u23F8 \u23ED" << endl;
+                }
+                else
+                {
+                    cout << "          \u23EE \u23F5 \u23ED" << endl;
+                }
+                cout << "-----------------------------" << endl;
+
                 break;
             case 3:
+                if (currentlyPlayingSong->next != NULL)
+                {
+                    currentlyPlayingSong = currentlyPlayingSong->next;
+                }
+                else
+                {
+                    cout << endl;
+                    cout << "End of playlist" << endl;
+                }
+                currentlyPlayingSong = currentlyPlayingHead;
+                cout << endl;
+                cout << "-----------------------------" << endl;
+                cout << "      " << currentlyPlayingSong->data.title << endl;
+                cout << "      " << currentlyPlayingSong->data.artist << endl;
+                cout << "           \u23EE \u23F8 \u23ED" << endl;
+                cout << "-----------------------------" << endl;
+                break;
+            case 4:
             {
+                string songTitle;
                 cout << "Enter Song you want to add in Queue: ";
                 getline(cin, songTitle);
                 Song *song = searchByTitle(songTitle);
@@ -271,7 +305,7 @@ public:
                 }
                 break;
             }
-            case 4:
+            case 5:
                 emptyQueue();
                 cout << "Exiting the player..." << endl;
                 return;
@@ -478,7 +512,6 @@ int main()
 {
     string playlistName;
     UserLibraryManager userLibraryManager;
-    Song *song;
     int choice = 0;
     string title;
     string artist;
@@ -510,9 +543,10 @@ int main()
             libraryManager.display();
             break;
         case 2:
+        {
             cout << "Enter Title: ";
             getline(cin, title);
-            song = searchByTitle(title);
+            Song *song = searchByTitle(title);
             if (song == NULL)
             {
                 cout << "Song not found" << endl;
@@ -522,6 +556,7 @@ int main()
                 libraryManager.displaySong(*song);
             }
             break;
+        }
         case 3:
             cout << "Enter Artist: ";
             getline(cin, artist);
@@ -538,6 +573,7 @@ int main()
             userLibraryManager.displayPlaylist(playlistName);
             break;
         case 6:
+        {
             cout << "Enter Playlist Name: ";
             getline(cin, playlistName);
             if (userLibraryManager.getPlaylist(playlistName) == NULL)
@@ -547,7 +583,7 @@ int main()
             }
             cout << "Enter Song Title: ";
             getline(cin, title);
-            song = searchByTitle(title);
+            Song *song = searchByTitle(title);
             if (song == NULL)
             {
                 cout << "Song not found" << endl;
@@ -557,6 +593,7 @@ int main()
                 userLibraryManager.addSongToPlaylist(playlistName, *song);
             }
             break;
+        }
         case 7:
             userLibraryManager.displayUserLibrary();
             break;
