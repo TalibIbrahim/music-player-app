@@ -1,5 +1,4 @@
 #include <iostream>
-// #include <raylib.h>
 #include <fstream>
 #include <sstream>
 #include <cctype>
@@ -43,6 +42,40 @@ struct UserLibrary
     UserLibrary *next;
     UserLibrary *prev;
 };
+
+struct currentlyPlayingQueue
+{
+    Song data;
+    currentlyPlayingQueue *next;
+    currentlyPlayingQueue *prev;
+};
+
+currentlyPlayingQueue *currentlyPlayingHead = NULL;
+currentlyPlayingQueue *currentlyPlayingSong = NULL;
+currentlyPlayingQueue *currentlyPlayingTail = NULL;
+
+// Global library head
+
+Library *libraryHead;
+
+// Global Function to search for a song by title
+
+Song *searchByTitle(string title)
+{
+    Library *temp = libraryHead;
+    string convertedTitle = toLower(title);
+
+    while (temp != NULL)
+    {
+        if (toLower(temp->data.title).find(convertedTitle) != string::npos) // Partial match
+        {
+            return &temp->data; // Return first match
+        }
+        temp = temp->next;
+    }
+    return NULL;
+}
+
 class UserLibraryManager
 {
 private:
@@ -55,13 +88,13 @@ public:
     }
     ~UserLibraryManager()
     {
-        // UserLibrary *temp = userLibraryHead;
-        // while (temp != NULL)
-        // {
-        //     UserLibrary *next = temp->next;
-        //     delete temp;
-        //     temp = next;
-        // }
+        UserLibrary *temp = userLibraryHead;
+        while (temp != NULL)
+        {
+            UserLibrary *next = temp->next;
+            delete temp;
+            temp = next;
+        }
     }
     void createPlaylistInLibrary(string name)
     {
@@ -90,12 +123,14 @@ public:
     Playlist *getPlaylist(string name)
     {
         UserLibrary *temp = userLibraryHead;
+        string convertedName = toLower(name);
         while (temp != NULL)
         {
             Playlist *tempPlaylist = temp->playlistsHead;
             while (tempPlaylist != NULL)
             {
-                if (tempPlaylist->name == name)
+                string convertedPlaylistName = toLower(tempPlaylist->name);
+                if (convertedPlaylistName.find(convertedName) != string::npos)
                 {
                     return tempPlaylist;
                 }
@@ -104,6 +139,147 @@ public:
             temp = temp->next;
         }
         return NULL;
+    }
+    void addSongToQueue(Song song)
+    {
+        if (currentlyPlayingHead == NULL)
+        {
+            currentlyPlayingHead = new currentlyPlayingQueue();
+            currentlyPlayingHead->data = song;
+            currentlyPlayingHead->next = NULL;
+            currentlyPlayingHead->prev = NULL;
+            currentlyPlayingTail = currentlyPlayingHead;
+        }
+        else
+        {
+            currentlyPlayingQueue *newSong = new currentlyPlayingQueue();
+            newSong->data = song;
+            newSong->next = NULL;
+            newSong->prev = currentlyPlayingTail;
+            currentlyPlayingTail->next = newSong;
+            currentlyPlayingTail = newSong;
+        }
+    }
+    void displayQueue()
+    {
+        if (currentlyPlayingHead == NULL)
+        {
+            cout << "No songs in queue" << endl;
+            return;
+        }
+        currentlyPlayingQueue *temp = currentlyPlayingHead;
+        while (temp != NULL)
+        {
+            // data = song
+            cout << temp->data.title << " ";
+            cout << temp->data.duration << " ";
+            cout << temp->data.genre << " ";
+            cout << temp->data.artist << " ";
+            cout << endl;
+            temp = temp->next;
+        }
+    }
+    void emptyQueue()
+    {
+        currentlyPlayingQueue *temp = currentlyPlayingHead;
+        while (temp != NULL)
+        {
+            currentlyPlayingQueue *next = temp->next;
+            delete temp;
+            temp = next;
+        }
+        currentlyPlayingHead = NULL;
+        currentlyPlayingTail = NULL;
+    }
+    void playSongFromPlaylist()
+    {
+        string playlistName;
+        string songTitle;
+        cout << "Enter the playlist name: ";
+        getline(cin, playlistName);
+        Playlist *playlist = getPlaylist(playlistName);
+        if (playlist == NULL)
+        {
+            cout << "Playlist not found" << endl;
+            return;
+        }
+        emptyQueue();
+        Library *temp = playlist->songs; // first song in playlist
+        if (temp == NULL)
+        {
+            cout << "No songs in playlist" << endl;
+            return;
+        }
+        while (temp != NULL)
+        {
+            addSongToQueue(temp->data);
+            temp = temp->next;
+        }
+        currentlyPlayingSong = currentlyPlayingHead;
+        int choice = 0;
+        while (true)
+        {
+            cout << endl;
+            cout << "-----------------------------" << endl;
+            cout << "      " << currentlyPlayingSong->data.title << endl;
+            cout << "      " << currentlyPlayingSong->data.artist << endl;
+            cout << "           \u23EE \u23F8 \u23ED" << endl;
+            cout << "-----------------------------" << endl;
+            cout << "1. Next \u23ED" << endl;
+            cout << "2. Previous \u23EE" << endl;
+            cout << "3. Add to Queue." << endl;
+            cout << "4. Exit" << endl;
+            cout << "Enter your choice: ";
+            cin >> choice;
+            switch (choice)
+            {
+            case 1:
+                if (currentlyPlayingSong->next != NULL)
+                {
+                    currentlyPlayingSong = currentlyPlayingSong->next;
+                }
+                else
+                {
+                    cout << endl;
+                    cout << "End of playlist" << endl;
+                }
+                break;
+            case 2:
+                if (currentlyPlayingSong->prev != NULL)
+                {
+                    currentlyPlayingSong = currentlyPlayingSong->prev;
+                }
+                else
+                {
+                    cout << endl;
+                    cout << "Start of playlist" << endl;
+                }
+                break;
+            case 3:
+            {
+                cout << "Enter Song you want to add in Queue: ";
+                getline(cin, songTitle);
+                Song *song = searchByTitle(songTitle);
+                if (song == NULL)
+                {
+                    cout << endl;
+                    cout << "Song not found" << endl;
+                }
+                else
+                {
+                    addSongToQueue(*song);
+                }
+                break;
+            }
+            case 4:
+                emptyQueue();
+                cout << "Exiting the player..." << endl;
+                return;
+            default:
+                cout << "Invalid choice" << endl;
+                break;
+            }
+        }
     }
     void addSongToPlaylist(string playlistName, Song song)
     {
@@ -131,11 +307,17 @@ public:
             temp->next = newSong;
             newSong->prev = temp;
         }
+        cout << song.title << " added to playlist: " << playlist->name << endl;
     }
     void displayUserLibrary()
     {
         // displaying playlists in library without songs
         UserLibrary *temp = userLibraryHead;
+        if (temp == NULL)
+        {
+            cout << "No playlists found" << endl;
+            return;
+        }
         while (temp != NULL)
         {
             cout << "Playlist: " << temp->playlistsHead->name << endl;
@@ -151,6 +333,11 @@ public:
             return;
         }
         Library *temp = playlist->songs;
+        if (temp == NULL)
+        {
+            cout << "No songs in playlist" << endl;
+            return;
+        }
         while (temp != NULL)
         {
             cout << temp->data.title << " ";
@@ -164,9 +351,6 @@ public:
 };
 class LibraryManager
 {
-private:
-    Library *libraryHead;
-
 public:
     LibraryManager()
     {
@@ -225,20 +409,7 @@ public:
         cout << song.artist << " ";
         cout << endl;
     }
-    Song *searchByTitle(string title)
-    {
-        Library *temp = libraryHead;
-        string ConvertedTitle = toLower(title);
-        while (temp != NULL)
-        {
-            if (toLower(temp->data.title) == ConvertedTitle)
-            {
-                return &temp->data;
-            }
-            temp = temp->next;
-        }
-        return NULL;
-    }
+
     void searchByArtist(string artist)
     {
         string ConvertedArtist = toLower(artist);
@@ -325,10 +496,11 @@ int main()
         cout << "5. Display Playlist." << endl;
         cout << "6. Add Song to Playlist." << endl;
         cout << "7. Display User Library." << endl;
-        cout << "8. Exit" << endl;
+        cout << "8. Play Song From Playlist." << endl;
+        cout << "9. Exit" << endl;
 
         // Get user's choice
-        cout << "Enter your choice (1-8): ";
+        cout << "Enter your choice (1-9): ";
         cin >> choice;
         cin.ignore(); // Ignore the newline character left by cin
 
@@ -340,7 +512,7 @@ int main()
         case 2:
             cout << "Enter Title: ";
             getline(cin, title);
-            song = libraryManager.searchByTitle(title);
+            song = searchByTitle(title);
             if (song == NULL)
             {
                 cout << "Song not found" << endl;
@@ -368,9 +540,14 @@ int main()
         case 6:
             cout << "Enter Playlist Name: ";
             getline(cin, playlistName);
+            if (userLibraryManager.getPlaylist(playlistName) == NULL)
+            {
+                cout << "Playlist not found" << endl;
+                break;
+            }
             cout << "Enter Song Title: ";
             getline(cin, title);
-            song = libraryManager.searchByTitle(title);
+            song = searchByTitle(title);
             if (song == NULL)
             {
                 cout << "Song not found" << endl;
@@ -384,6 +561,9 @@ int main()
             userLibraryManager.displayUserLibrary();
             break;
         case 8:
+            userLibraryManager.playSongFromPlaylist();
+            break;
+        case 9:
             cout << "Exiting the program..." << endl;
             return 0;
 
