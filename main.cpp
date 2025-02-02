@@ -392,13 +392,13 @@ public:
     }
     ~LibraryManager()
     {
-        // Library *temp = libraryHead;
-        // while (temp != NULL)
-        // {
-        //     Library *next = temp->next;
-        //     delete temp;
-        //     temp = next;
-        // }
+        Library *temp = libraryHead;
+        while (temp != NULL)
+        {
+            Library *next = temp->next;
+            delete temp;
+            temp = next;
+        }
     }
     void addSongToLibrary(Song song)
     {
