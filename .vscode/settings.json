@@ -13,7 +13,8 @@
     "iostream": "cpp",
     "fstream": "cpp",
     "ostream": "cpp",
-    "cctype": "cpp"
+    "cctype": "cpp",
+    "string": "cpp"
   },
   "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }

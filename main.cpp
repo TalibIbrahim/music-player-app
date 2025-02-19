@@ -110,6 +110,7 @@ public:
         }
         else
         {
+            // insert at tail
             UserLibrary *temp = userLibraryHead;
             while (temp->next != NULL)
             {
@@ -216,6 +217,7 @@ public:
     {
         if (currentlyPlayingHead == NULL)
         {
+            // if queue empty create head
             currentlyPlayingHead = new currentlyPlayingQueue();
             currentlyPlayingHead->data = song;
             currentlyPlayingHead->next = NULL;
@@ -224,6 +226,7 @@ public:
         }
         else
         {
+            // insert at tail
             currentlyPlayingQueue *newSong = new currentlyPlayingQueue();
             newSong->data = song;
             newSong->next = NULL;
@@ -256,6 +259,8 @@ public:
     }
     void loopQueue(bool enable = true)
     {
+        // doubly ll converted to circular ll
+        // toggle loop func
         // loop the currently playing queue so it plays in cycle
         if (enable)
         {
@@ -270,6 +275,7 @@ public:
     }
     void emptyQueue()
     {
+        // alwasy run before creating queu
         currentlyPlayingQueue *temp = currentlyPlayingHead;
         while (temp != NULL)
         {
@@ -291,9 +297,9 @@ public:
             cout << "Playlist not found" << endl;
             return;
         }
-        emptyQueue();
+        emptyQueue();                    // empty q if playlist found
         Library *temp = playlist->songs; // first song in playlist
-        if (temp == NULL)
+        if (temp == NULL)                // if pl has song
         {
             cout << "No songs in playlist" << endl;
             return;
@@ -358,7 +364,7 @@ public:
             case 2:
                 system("clear");
 
-                isPlaying = !isPlaying;
+                isPlaying = !isPlaying; // toggle play puase bool
                 cout << endl;
                 cout << "-----------------------------" << endl;
                 cout << "      " << currentlyPlayingSong->data.title << endl;
@@ -412,7 +418,7 @@ public:
                 break;
             case 4:
             {
-                cin.ignore();
+                cin.ignore(); // ignore newline character left by cin
                 string songTitle;
                 cout << "Enter Song you want to add in Queue: ";
                 getline(cin, songTitle);
@@ -430,7 +436,7 @@ public:
             }
             case 5:
                 system("clear");
-                isLooped = !isLooped;
+                isLooped = !isLooped; // toggle loop
                 loopQueue(isLooped);
                 if (isLooped)
                 {
@@ -471,6 +477,7 @@ public:
         }
         else
         {
+            // insert at tail
             Library *temp = playlist->songs;
             while (temp->next != NULL)
             {
@@ -795,5 +802,4 @@ int main()
 
     return 0;
 }
-
-// post code circle jerk session @bytercrew
+// post code circlejerk session @bytercrew
